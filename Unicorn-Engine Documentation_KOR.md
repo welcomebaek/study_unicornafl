@@ -1,3 +1,5 @@
+> **__NOTE__**: This document is translated with AI assistance
+
 # Unicorn-Engine API Documentation
 
 | Version | 2.0.0 |
@@ -7,17 +9,17 @@
 
 [PDF File](https://github.com/kabeor/Micro-Unicorn-Engine-API-Documentation) 
 
-[Unicorn Engine](http://www.unicorn-engine.org/)是一个轻量级, 多平台, 多架构的CPU模拟器框架，当前版本基于[Qemu](https://www.qemu.org/) 5.0.1开发，它可以代替CPU模拟代码的执行，常用于程序虚拟、恶意代码分析、Fuzzing等，本项目被用于[Qiling虚拟框架](https://github.com/qilingframework/qiling)，[Radare2逆向分析框架](https://github.com/qilingframework/qiling)，[GEF(gdb的pwn分析插件)](https://github.com/hugsy/gef)，[Pwndbg](https://github.com/pwndbg/pwndbg)，[Angr符号执行框架](https://github.com/angr/angr)等多个著名项目。
+[Unicorn Engine](http://www.unicorn-engine.org/)은 경량, 다중 플랫폼, 다중 아키텍처의 CPU 에뮬레이터 프레임워크로, 현재 버전은 [Qemu](https://www.qemu.org/) 5.0.1을 기반으로 개발되었습니다. 이는 CPU 에뮬레이션 코드의 실행을 대체할 수 있으며, 주로 프로그램 가상화, 악성 코드 분석, Fuzzing 등에 사용됩니다. 이 프로젝트는 [Qiling 가상화 프레임워크](https://github.com/qilingframework/qiling), [Radare2 리버스 엔지니어링 프레임워크](https://github.com/qilingframework/qiling), [GEF(gdb의 pwn 분석 플러그인)](https://github.com/hugsy/gef), [Pwndbg](https://github.com/pwndbg/pwndbg), [Angr 심볼릭 실행 프레임워크](https://github.com/angr/angr) 등 여러 유명 프로젝트에서 사용되고 있습니다.
 
-## 0x0 开发准备
+## 0x0 개발 준비
 
-Unicorn官网:     http://www.unicorn-engine.org
+Unicorn웹사이트:     http://www.unicorn-engine.org
 
 ```bash
 git clone https://github.com/unicorn-engine/unicorn.git
 ```
 
-### 编译
+### 빌드
 
 <details><summary>Linux & MacOS</summary>
 
@@ -31,7 +33,7 @@ MacOS
 brew install cmake pkg-config
 ```
 
-使用以下命令编译
+다음 명령을 사용하여 컴파일하십시오.
 ```bash
 mkdir build; cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -41,106 +43,110 @@ make
 
 <details><summary>Windows</summary>
 
-Microsoft MSVC编译器编译
+Microsoft MSVC 컴파일러로 컴파일
 ```bash
-//安装cmake 及 Microsoft Visual Studio (>=16.8)
-//在Visual Studio Command Prompt使用以下命令编译
+// cmake 및 Microsoft Visual Studio (>=16.8) 설치
+// Visual Studio Command Prompt에서 다음 명령을 사용하여 컴파일
 mkdir build; cd build
 cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
 nmake
 ```
 
-<details><summary>VS GUI内编译lib和dll(旧)</summary>
+<details><summary>VS GUI에서 lib와 dll 컴파일 (구 버전)</summary>
 
-源码： https://github.com/unicorn-engine/unicorn/archive/master.zip
+소스코드： https://github.com/unicorn-engine/unicorn/archive/master.zip
 
-下载后解压
+다운로드 후 압축 해제
 
-文件结构如下：
+파일 구조는 다음과 같습니다:
 
 ```
-. <- 主要引擎core engine + README + 编译文档COMPILE.TXT 等
-├── bindings <- 绑定
-│ ├── dotnet <- .Net 绑定 + 测试代码
-│ ├── go <- go 绑定 + 测试代码
-│ ├── haskell <- Haskell 绑定 + 测试代码
-│ ├── java <- Java 绑定 + 测试代码
-│ ├── pascal <- Pascal 绑定 + 测试代码
-│ ├── python <- Python 绑定 + 测试代码
-│ ├── ruby <- Ruby 绑定 + 测试代码
-│ ├── rust <- Rust 绑定 + 测试代码
-│ └── vb6 <- VB6 绑定 + 测试代码
-├── docs <- 文档
-├── glib_compat <- 基于glib 2.64.4修改的兼容库
-├── include <- C头文件
-├── msvc <- Microsoft Visual Studio 支持（Windows）
-├── qemu <- qemu(已修改)源码
-├── samples <- Unicorn使用示例
-└── tests <- C语言测试用例
+. <- 주요 엔진 core engine + README + 컴파일 문서 COMPILE.TXT 등
+├── bindings <- 바인딩
+│ ├── dotnet <- .Net 바인딩 + 테스트 코드
+│ ├── go <- go 바인딩 + 테스트 코드
+│ ├── haskell <- Haskell 바인딩 + 테스트 코드
+│ ├── java <- Java 바인딩 + 테스트 코드
+│ ├── pascal <- Pascal 바인딩 + 테스트 코드
+│ ├── python <- Python 바인딩 + 테스트 코드
+│ ├── ruby <- Ruby 바인딩 + 테스트 코드
+│ ├── rust <- Rust 바인딩 + 테스트 코드
+│ └── vb6 <- VB6 바인딩 + 테스트 코드
+├── docs <- 문서
+├── glib_compat <- glib 2.64.4 기반으로 수정된 호환 라이브러리
+├── include <- C 헤더 파일
+├── msvc <- Microsoft Visual Studio 지원 (Windows)
+├── qemu <- 수정된 qemu 소스 코드
+├── samples <- Unicorn 사용 예제
+└── tests <- C 언어 테스트 케이스
 ```
 
-下面演示Windows10使用Visual Studio 2019编译
+아래는 Windows 10에서 Visual Studio 2019를 사용하여 컴파일하는 방법입니다.
 
-打开msvc文件夹，内部结构如下
+msvc 폴더를 열면 내부 구조는 다음과 같습니다.
 
 ![image.png](API_Doc_Pic/1_1.png)
 
-VS打开unicorn.sln项目文件，解决方案自动载入这些
+Visual Studio에서 unicorn.sln 프로젝트 파일을 열면, 솔루션이 자동으로 다음 항목들을 로드합니다.
 
 ![image.png](API_Doc_Pic/1_2.png)
 
-如果都需要的话，直接编译就好了，只需要其中几种，则右键解决方案->属性->配置属性->生成选项 中勾选你需要的支持项即可
+모든 항목이 필요하다면, 바로 컴파일하면 됩니다. 일부 항목만 필요하다면, 솔루션을 마우스 오른쪽 버튼으로 클릭 -> 속성 -> 구성 속성 -> 빌드 옵션에서 필요한 지원 항목을 선택하면 됩니다.
 
-也可在启动项目中配置多个项目操作 如下
+또한, 시작 프로젝트에서 여러 프로젝트를 구성할 수 있습니다. 아래와 같이 설정하십시오.
 
 ![image.png](API_Doc_Pic/1_3.png)
 
+컴파일 후 현재 폴더의 Debug 디렉토리에 unicorn.lib 정적 라이브러리와 unicorn.dll 동적 라이브러리가 생성됩니다. 이렇게 하면 Unicorn을 사용한 개발을 시작할 수 있습니다.
 
-
-编译后会在当前文件夹Debug目录下生成unicorn.lib静态编译库和unicorn.dll动态库这样就可以开始使用Unicorn进行开发了
-
-官方目前提供的最新已编译版本为1.0.3版本，可自己编辑最新版本源码，以获得更多可用API。
+공식적으로 제공되는 최신 컴파일된 버전은 1.0.3 버전이며, 최신 버전의 소스를 직접 편집하여 더 많은 사용 가능한 API를 얻을 수 있습니다.
 
 > Win32：https://github.com/unicorn-engine/unicorn/releases/download/2.0.0/unicorn-2.0.0-win32.zip
 
 > Win64：https://github.com/unicorn-engine/unicorn/releases/download/2.0.0/unicorn-2.0.0-win64.zip
 
-**注意： 选x32或x64将影响后面开发的架构**
+**주의: x32 또는 x64를 선택하면 이후 개발의 아키텍처에 영향을 미칩니다**
 
-点击编译，到unicorn\msvc\x32或x64\Debug或Release下找unicorn.dll和unicorn.lib即可
+컴파일을 클릭한 후, unicorn\msvc\x32 또는 x64\Debug 또는 Release 디렉토리에서 unicorn.dll과 unicorn.lib를 찾으면 됩니다.
 
 </details>
 </details>
 
-> 其他编译方式点击[这里](https://github.com/unicorn-engine/unicorn/blob/master/docs/COMPILE.md)
+> 다른 컴파일 방법은 [여기](https://github.com/unicorn-engine/unicorn/blob/master/docs/COMPILE.md)를 클릭하세요.
 
-### 安装
-- Python模块
+### 설치
+- Python모듈
 ``` bash
 pip install unicorn
 
-//如已安装1.x版本可直接通过以下命令升级
+//1.x 버전을 설치한 경우, 다음 명령을 통해 직접 업그레이드할 수 있습니다.
 pip install unicorn --upgrade
 ```
 
-- MacOS HomeBrew包
+- MacOS HomeBrew패키지
 ```bash
 brew install unicorn
 ```
 
-### 引擎调用测试
-（以Windows VS2019为例）
-新建一个VS项目，将..\unicorn-master\include\unicorn中的头文件以及编译好的lib和dll文件全部拷贝到新建项目的主目录下
+### 엔진 호출 테스트
+(Windows VS2019을 예로 들었습니다)
+
+1. 새 VS 프로젝트를 생성합니다.
+2. ..\unicorn-master\include\unicorn 폴더에 있는 헤더 파일과 컴파일된 lib 및 dll 파일을 새 프로젝트의 주 디렉토리로 복사합니다.
 
 ![image.png](API_Doc_Pic/1_5.png)
 
-在VS解决方案中，头文件添加现有项unicorn.h，资源文件中添加unicorn.lib，重新生成解决方案
+VS 솔루션에서 다음 단계를 수행합니다:
+
+1. 헤더 파일에 기존 항목으로 `unicorn.h`를 추가합니다.
+2. 리소스 파일에 `unicorn.lib`를 추가합니다.
+3. 솔루션을 다시 빌드합니다.
 
 ![image.png](API_Doc_Pic/1_6.png)
 
-接下来测试我们生成的Unicorn引擎
+이제 생성한 Unicorn 엔진을 테스트해봅시다.
 
-主文件代码如下
+메인 파일 코드는 다음과 같습니다:
 
 <details><summary> Code </summary>
 
@@ -148,52 +154,52 @@ brew install unicorn
 #include <iostream>
 #include "unicorn/unicorn.h"
 
-// 要模拟的指令
+// 에뮬레이션할 명령
 #define X86_CODE32 "\x41\x4a" // INC ecx; DEC edx
 
-// 起始地址
+// 시작 주소
 #define ADDRESS 0x1000000
 
 int main()
 {
     uc_engine* uc;
     uc_err err;
-    int r_ecx = 0x1234;     // ECX 寄存器
-    int r_edx = 0x7890;     // EDX 寄存器
+    int r_ecx = 0x1234;     // ECX 레지스터
+    int r_edx = 0x7890;     // EDX 레지스터
 
     printf("Emulate i386 code\n");
 
-    // X86-32bit 模式初始化模拟
+    // X86-32bit 모드 초기화 에뮬레이션
     err = uc_open(UC_ARCH_X86, UC_MODE_32, &uc);
     if (err != UC_ERR_OK) {
         printf("Failed on uc_open() with error returned: %u\n", err);
-            return -1;
+        return -1;
     }
 
-    // 给模拟器申请 2MB 内存
+    // 에뮬레이터에 2MB 메모리 할당
     uc_mem_map(uc, ADDRESS, 2 * 1024 * 1024, UC_PROT_ALL);
 
-    // 将要模拟的指令写入内存
+    // 에뮬레이션할 명령을 메모리에 씀
     if (uc_mem_write(uc, ADDRESS, X86_CODE32, sizeof(X86_CODE32) - 1)) {
         printf("Failed to write emulation code to memory, quit!\n");
         return -1;
     }
 
-    // 初始化寄存器
+    // 레지스터 초기화
     uc_reg_write(uc, UC_X86_REG_ECX, &r_ecx);
     uc_reg_write(uc, UC_X86_REG_EDX, &r_edx);
 
     printf(">>> ECX = 0x%x\n", r_ecx);
     printf(">>> EDX = 0x%x\n", r_edx);
 
-     // 模拟代码
+     // 명령어 에뮬레이션
     err = uc_emu_start(uc, ADDRESS, ADDRESS + sizeof(X86_CODE32) - 1, 0, 0);
     if (err) {
         printf("Failed on uc_emu_start() with error returned %u: %s\n",
         err, uc_strerror(err));
     }
 
-    // 打印寄存器值
+    // 레지스터 값 출력
     printf("Emulation done. Below is the CPU context\n");
 
     uc_reg_read(uc, UC_X86_REG_ECX, &r_ecx);
@@ -210,15 +216,15 @@ int main()
 </details>
 
 
-运行结果如下
+실행 결과는 다음과 같습니다.
 
 ![image.png](API_Doc_Pic/1_7.png)
 
-ecx+1和edx-1成功模拟。
+ECX +1과 EDX -1이 성공적으로 에뮬레이션되었습니다.
 
-## 0x1 数据类型
+## 0x1 데이터 타입
 
-> 索引
+### 차례
 
 [uc_arch](#uc_arch)
 
@@ -246,22 +252,22 @@ ecx+1和edx-1成功模拟。
 
 ### uc_arch
 
-架构选择
+아키텍처 선택
 
 <details><summary> Code </summary>
 
 ```cpp
 typedef enum uc_arch {
-    UC_ARCH_ARM = 1,    // ARM 架构 (包括 Thumb, Thumb-2)
-    UC_ARCH_ARM64,      // ARM-64, 也称 AArch64
-    UC_ARCH_MIPS,       // Mips 架构
-    UC_ARCH_X86,        // X86 架构 (包括 x86 & x86-64)
-    UC_ARCH_PPC,        // PowerPC 架构
-    UC_ARCH_SPARC,      // Sparc 架构
-    UC_ARCH_M68K,       // M68K 架构
-    UC_ARCH_RISCV,      // RISCV 架构
-    UC_ARCH_S390X,      // S390X 架构
-    UC_ARCH_TRICORE,    // TriCore 架构
+    UC_ARCH_ARM = 1,    // ARM 아키텍처 (Thumb, Thumb-2 포함)
+    UC_ARCH_ARM64,      // ARM-64, AArch64라고도 함
+    UC_ARCH_MIPS,       // MIPS 아키텍처
+    UC_ARCH_X86,        // X86 아키텍처 (x86 및 x86-64 포함)
+    UC_ARCH_PPC,        // PowerPC 아키텍처
+    UC_ARCH_SPARC,      // SPARC 아키텍처
+    UC_ARCH_M68K,       // M68K 아키텍처
+    UC_ARCH_RISCV,      // RISCV 아키텍처
+    UC_ARCH_S390X,      // S390X 아키텍처
+    UC_ARCH_TRICORE,    // TriCore 아키텍처
     UC_ARCH_MAX,
 } uc_arch;
 ```
@@ -270,55 +276,55 @@ typedef enum uc_arch {
 
 ### uc_mode
 
-模式选择
+모드 선택
 
 <details><summary> Code </summary>
 
 ```cpp
 typedef enum uc_mode {
-    UC_MODE_LITTLE_ENDIAN = 0,    // 小端序模式 (默认)
-    UC_MODE_BIG_ENDIAN = 1 << 30, // 大端序模式
+    UC_MODE_LITTLE_ENDIAN = 0,    // 리틀 엔디안 모드 (기본값)
+    UC_MODE_BIG_ENDIAN = 1 << 30, // 빅 엔디안 모드
 
     // arm / arm64
-    UC_MODE_ARM = 0,              // ARM 模式
-    UC_MODE_THUMB = 1 << 4,       // THUMB 模式 (包括 Thumb-2)
+    UC_MODE_ARM = 0,              // ARM 모드
+    UC_MODE_THUMB = 1 << 4,       // THUMB 모드 (Thumb-2 포함)
     
-    //已弃用，转为使用UC_ARM_CPU_* 和 uc_ctl
-    UC_MODE_MCLASS = 1 << 5,      // ARM's Cortex-M 系列 
-    UC_MODE_V8 = 1 << 6,          // ARMv8 A32 encodings for ARM 
-    UC_MODE_ARMBE8 = 1 << 10, // 大端序数据和小端序代码 仅为兼容UC1版本
+    // 폐기됨, UC_ARM_CPU_* 및 uc_ctl로 전환
+    UC_MODE_MCLASS = 1 << 5,      // ARM의 Cortex-M 시리즈
+    UC_MODE_V8 = 1 << 6,          // ARMv8 A32 인코딩
+    UC_MODE_ARMBE8 = 1 << 10, // 빅 엔디안 데이터와 리틀 엔디안 코드, UC1 버전과의 호환성을 위해
 
-    // arm (32bit) cpu 类型
-    //已弃用，转为使用UC_ARM_CPU_* 和 uc_ctl
-    UC_MODE_ARM926 = 1 << 7,	  // ARM926 CPU 类型
-    UC_MODE_ARM946 = 1 << 8,	  // ARM946 CPU 类型
-    UC_MODE_ARM1176 = 1 << 9,	  // ARM1176 CPU 类型
+    // arm (32bit) CPU 타입
+    // 폐기됨, UC_ARM_CPU_* 및 uc_ctl로 전환
+    UC_MODE_ARM926 = 1 << 7,	  // ARM926 CPU 타입
+    UC_MODE_ARM946 = 1 << 8,	  // ARM946 CPU 타입
+    UC_MODE_ARM1176 = 1 << 9,	  // ARM1176 CPU 타입
 
     // mips
-    UC_MODE_MICRO = 1 << 4,       // MicroMips 模式 (暂不支持)
-    UC_MODE_MIPS3 = 1 << 5,       // Mips III ISA (暂不支持)
-    UC_MODE_MIPS32R6 = 1 << 6,    // Mips32r6 ISA (暂不支持)
+    UC_MODE_MICRO = 1 << 4,       // MicroMips 모드 (지원되지 않음)
+    UC_MODE_MIPS3 = 1 << 5,       // Mips III ISA (지원되지 않음)
+    UC_MODE_MIPS32R6 = 1 << 6,    // Mips32r6 ISA (지원되지 않음)
     UC_MODE_MIPS32 = 1 << 2,      // Mips32 ISA
     UC_MODE_MIPS64 = 1 << 3,      // Mips64 ISA
 
     // x86 / x64
-    UC_MODE_16 = 1 << 1,          // 16-bit 模式
-    UC_MODE_32 = 1 << 2,          // 32-bit 模式
-    UC_MODE_64 = 1 << 3,          // 64-bit 模式
+    UC_MODE_16 = 1 << 1,          // 16비트 모드
+    UC_MODE_32 = 1 << 2,          // 32비트 모드
+    UC_MODE_64 = 1 << 3,          // 64비트 모드
 
     // ppc
-    UC_MODE_PPC32 = 1 << 2,       // 32-bit 模式
-    UC_MODE_PPC64 = 1 << 3,       // 64-bit 模式 (暂不支持)
-    UC_MODE_QPX = 1 << 4,         // Quad Processing eXtensions 模式 (暂不支持)
+    UC_MODE_PPC32 = 1 << 2,       // 32비트 모드
+    UC_MODE_PPC64 = 1 << 3,       // 64비트 모드 (지원되지 않음)
+    UC_MODE_QPX = 1 << 4,         // Quad Processing eXtensions 모드 (지원되지 않음)
 
     // sparc
-    UC_MODE_SPARC32 = 1 << 2,     // 32-bit 模式
-    UC_MODE_SPARC64 = 1 << 3,     // 64-bit 模式
-    UC_MODE_V9 = 1 << 4,          // SparcV9 模式 (暂不支持)
+    UC_MODE_SPARC32 = 1 << 2,     // 32비트 모드
+    UC_MODE_SPARC64 = 1 << 3,     // 64비트 모드
+    UC_MODE_V9 = 1 << 4,          // SparcV9 모드 (지원되지 않음)
 
     // riscv
-    UC_MODE_RISCV32 = 1 << 2,     // 32-bit 模式
-    UC_MODE_RISCV64 = 1 << 3,     // 64-bit 模式
+    UC_MODE_RISCV32 = 1 << 2,     // 32비트 모드
+    UC_MODE_RISCV64 = 1 << 3,     // 64비트 모드
 
     // m68k
 } uc_mode;
@@ -329,34 +335,34 @@ typedef enum uc_mode {
 
 ### uc_err
 
-错误类型，是[uc_errno()](#uc_errno)的返回值
+오류 유형, 이는 [uc_errno()](#uc_errno)의 반환 값입니다.
 
 <details><summary> Code </summary>
 
 ```cpp
 typedef enum uc_err {
-    UC_ERR_OK = 0,           // 无错误
-    UC_ERR_NOMEM,            // 内存不足: uc_open(), uc_emulate()
-    UC_ERR_ARCH,             // 不支持的架构: uc_open()
-    UC_ERR_HANDLE,           // 不可用句柄
-    UC_ERR_MODE,             // 不可用/不支持架构: uc_open()
-    UC_ERR_VERSION,          // 不支持版本 (或语言绑定)
-    UC_ERR_READ_UNMAPPED,    // 由于在未映射的内存上读取而退出模拟: uc_emu_start()
-    UC_ERR_WRITE_UNMAPPED,   // 由于在未映射的内存上写入而退出模拟: uc_emu_start()
-    UC_ERR_FETCH_UNMAPPED,   // 由于在未映射的内存中获取数据而退出模拟: uc_emu_start()
-    UC_ERR_HOOK,             // 无效的hook类型: uc_hook_add()
-    UC_ERR_INSN_INVALID,     // 由于指令无效而退出模拟: uc_emu_start()
-    UC_ERR_MAP,              // 无效的内存映射: uc_mem_map()
-    UC_ERR_WRITE_PROT,       // 由于UC_MEM_WRITE_PROT冲突而停止模拟: uc_emu_start()
-    UC_ERR_READ_PROT,        // 由于UC_MEM_READ_PROT冲突而停止模拟: uc_emu_start()
-    UC_ERR_FETCH_PROT,       // 由于UC_MEM_FETCH_PROT冲突而停止模拟: uc_emu_start()
-    UC_ERR_ARG,              // 提供给uc_xxx函数的无效参数
-    UC_ERR_READ_UNALIGNED,   // 未对齐读取
-    UC_ERR_WRITE_UNALIGNED,  // 未对齐写入
-    UC_ERR_FETCH_UNALIGNED,  // 未对齐的提取
-    UC_ERR_HOOK_EXIST,       // 此事件的钩子已经存在
-    UC_ERR_RESOURCE,         // 资源不足: uc_emu_start()
-    UC_ERR_EXCEPTION,        // 未处理的CPU异常
+    UC_ERR_OK = 0,           // 오류 없음
+    UC_ERR_NOMEM,            // 메모리 부족: uc_open(), uc_emulate()
+    UC_ERR_ARCH,             // 지원되지 않는 아키텍처: uc_open()
+    UC_ERR_HANDLE,           // 사용 불가능한 핸들
+    UC_ERR_MODE,             // 사용 불가능/지원되지 않는 아키텍처: uc_open()
+    UC_ERR_VERSION,          // 지원되지 않는 버전 (또는 언어 바인딩)
+    UC_ERR_READ_UNMAPPED,    // 맵핑되지 않은 메모리에서 읽기 때문에 에뮬레이션 종료: uc_emu_start()
+    UC_ERR_WRITE_UNMAPPED,   // 맵핑되지 않은 메모리에 쓰기 때문에 에뮬레이션 종료: uc_emu_start()
+    UC_ERR_FETCH_UNMAPPED,   // 맵핑되지 않은 메모리에서 데이터 가져오기 때문에 에뮬레이션 종료: uc_emu_start()
+    UC_ERR_HOOK,             // 잘못된 훅 타입: uc_hook_add()
+    UC_ERR_INSN_INVALID,     // 잘못된 명령어 때문에 에뮬레이션 종료: uc_emu_start()
+    UC_ERR_MAP,              // 잘못된 메모리 맵핑: uc_mem_map()
+    UC_ERR_WRITE_PROT,       // UC_MEM_WRITE_PROT 충돌 때문에 에뮬레이션 중지: uc_emu_start()
+    UC_ERR_READ_PROT,        // UC_MEM_READ_PROT 충돌 때문에 에뮬레이션 중지: uc_emu_start()
+    UC_ERR_FETCH_PROT,       // UC_MEM_FETCH_PROT 충돌 때문에 에뮬레이션 중지: uc_emu_start()
+    UC_ERR_ARG,              // uc_xxx 함수에 제공된 잘못된 인수
+    UC_ERR_READ_UNALIGNED,   // 정렬되지 않은 읽기
+    UC_ERR_WRITE_UNALIGNED,  // 정렬되지 않은 쓰기
+    UC_ERR_FETCH_UNALIGNED,  // 정렬되지 않은 가져오기
+    UC_ERR_HOOK_EXIST,       // 이 이벤트에 대한 훅이 이미 존재함
+    UC_ERR_RESOURCE,         // 자원 부족: uc_emu_start()
+    UC_ERR_EXCEPTION,        // 처리되지 않은 CPU 예외
 } uc_err;
 ```
 
@@ -365,22 +371,22 @@ typedef enum uc_err {
 
 ### uc_mem_type
 
-UC_HOOK_MEM_*的所有内存访问类型
+UC_HOOK_MEM_*의 모든 메모리 접근 유형
 
 <details><summary> Code </summary>
 
 ```cpp
 typedef enum uc_mem_type {
-    UC_MEM_READ = 16,        // 内存从..读取
-    UC_MEM_WRITE,            // 内存写入到..
-    UC_MEM_FETCH,            // 内存被获取
-    UC_MEM_READ_UNMAPPED,    // 未映射内存从..读取
-    UC_MEM_WRITE_UNMAPPED,   // 未映射内存写入到..
-    UC_MEM_FETCH_UNMAPPED,   // 未映射内存被获取
-    UC_MEM_WRITE_PROT,       // 内存写保护，但是已映射
-    UC_MEM_READ_PROT,        // 内存读保护，但是已映射
-    UC_MEM_FETCH_PROT,       // 内存不可执行，但是已映射
-    UC_MEM_READ_AFTER,       // 内存从 (成功访问的地址) 读入
+    UC_MEM_READ = 16,        // 메모리에서..읽기
+    UC_MEM_WRITE,            // 메모리에 쓰기..
+    UC_MEM_FETCH,            // 메모리에서 가져오기
+    UC_MEM_READ_UNMAPPED,    // 맵핑되지 않은 메모리에서..읽기
+    UC_MEM_WRITE_UNMAPPED,   // 맵핑되지 않은 메모리에 쓰기..
+    UC_MEM_FETCH_UNMAPPED,   // 맵핑되지 않은 메모리에서 가져오기
+    UC_MEM_WRITE_PROT,       // 메모리 쓰기 보호, 하지만 맵핑됨
+    UC_MEM_READ_PROT,        // 메모리 읽기 보호, 하지만 맵핑됨
+    UC_MEM_FETCH_PROT,       // 메모리 실행 불가, 하지만 맵핑됨
+    UC_MEM_READ_AFTER,       // 메모리에서 (성공적으로 접근된 주소에서) 읽기
 } uc_mem_type;
 ```
 
