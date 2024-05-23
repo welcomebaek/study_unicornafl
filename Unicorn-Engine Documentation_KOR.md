@@ -393,150 +393,147 @@ typedef enum uc_mem_type {
 </details>
 
 
-### uc_hook_type
+### uc_hook_type 
 
-[uc_hook_add()](#uc_hook_add)的所有hook类型参数
+[uc_hook_add()](#uc_hook_add)의 모든 hook 유형 매개변수 
 
-<details><summary> Code </summary>
+<details><summary> Code </summary> 
 
-```cpp
-typedef enum uc_hook_type {
-    // Hook 所有中断/syscall 事件
-    UC_HOOK_INTR = 1 << 0,
-    // Hook 一条特定的指令 - 只支持非常小的指令子集
-    UC_HOOK_INSN = 1 << 1,
-    // Hook 一段代码
-    UC_HOOK_CODE = 1 << 2,
-    // Hook 基本块
-    UC_HOOK_BLOCK = 1 << 3,
-    // 用于在未映射的内存上读取内存的Hook
-    UC_HOOK_MEM_READ_UNMAPPED = 1 << 4,
-    // Hook 无效的内存写事件
-    UC_HOOK_MEM_WRITE_UNMAPPED = 1 << 5,
-    // Hook 执行事件的无效内存
-    UC_HOOK_MEM_FETCH_UNMAPPED = 1 << 6,
-    // Hook 读保护的内存
-    UC_HOOK_MEM_READ_PROT = 1 << 7,
-    // Hook 写保护的内存
-    UC_HOOK_MEM_WRITE_PROT = 1 << 8,
-    // Hook 不可执行内存上的内存
-    UC_HOOK_MEM_FETCH_PROT = 1 << 9,
-    // Hook 内存读取事件
-    UC_HOOK_MEM_READ = 1 << 10,
-    // Hook 内存写入事件
-    UC_HOOK_MEM_WRITE = 1 << 11,
-    // Hook 内存获取执行事件
-    UC_HOOK_MEM_FETCH = 1 << 12,
-    // Hook 内存读取事件，只允许能成功访问的地址
-    // 成功读取后将触发回调
-    UC_HOOK_MEM_READ_AFTER = 1 << 13,
-    // Hook 无效指令异常
-    UC_HOOK_INSN_INVALID = 1 << 14,
-    // Hook 新的(执行流的)边生成事件. 在程序分析中可能有用.
-    // 注意: 该Hook有两个方面不同于 UC_HOOK_BLOCK:
-    //       1. 该Hook在指令执行前被调用.
-    //       2. 该Hook仅在生成事件触发时被调用.
-    UC_HOOK_EDGE_GENERATED = 1 << 15,
-    // Hook 特定的 tcg 操作码. 用法与UC_HOOK_INSN相似.
-    UC_HOOK_TCG_OPCODE = 1 << 16,
-} uc_hook_type;
-```
+```cpp 
+typedef enum uc_hook_type 
+{ 
+    // 모든 인터럽트/syscall 이벤트를 Hook 
+    UC_HOOK_INTR = 1 << 0, 
+    // 특정 명령어를 Hook - 매우 작은 명령어 하위 집합만 지원 
+    UC_HOOK_INSN = 1 << 1, 
+    // 코드 영역을 Hook 
+    UC_HOOK_CODE = 1 << 2, 
+    // 기본 블록을 Hook 
+    UC_HOOK_BLOCK = 1 << 3, 
+    // 매핑되지 않은 메모리에서 메모리 읽기 이벤트를 Hook 
+    UC_HOOK_MEM_READ_UNMAPPED = 1 << 4, 
+    // 잘못된 메모리 쓰기 이벤트를 Hook 
+    UC_HOOK_MEM_WRITE_UNMAPPED = 1 << 5, 
+    // 잘못된 메모리에서 실행 이벤트를 Hook 
+    UC_HOOK_MEM_FETCH_UNMAPPED = 1 << 6, 
+    // 읽기 보호된 메모리를 Hook 
+    UC_HOOK_MEM_READ_PROT = 1 << 7, 
+    // 쓰기 보호된 메모리를 Hook 
+    UC_HOOK_MEM_WRITE_PROT = 1 << 8, 
+    // 실행 불가능한 메모리에서 메모리를 Hook 
+    UC_HOOK_MEM_FETCH_PROT = 1 << 9, 
+    // 메모리 읽기 이벤트를 Hook 
+    UC_HOOK_MEM_READ = 1 << 10, 
+    // 메모리 쓰기 이벤트를 Hook 
+    UC_HOOK_MEM_WRITE = 1 << 11, 
+    // 메모리 실행 가져오기 이벤트를 Hook 
+    UC_HOOK_MEM_FETCH = 1 << 12, 
+    // 메모리 읽기 이벤트를 Hook, 성공적으로 액세스할 수 있는 주소만 허용 
+    // 성공적으로 읽은 후 콜백이 트리거됨 
+    UC_HOOK_MEM_READ_AFTER = 1 << 13, 
+    // 잘못된 명령어 예외를 Hook 
+    UC_HOOK_INSN_INVALID = 1 << 14, 
+    // 새로운 (실행 흐름) 에지 생성 이벤트를 Hook. 프로그램 분석에 유용할 수 있음. 
+    // 참고: 이 Hook은 UC_HOOK_BLOCK과 두 가지 측면에서 다름: 
+    // 1. 이 Hook은 명령어 실행 전에 호출됨. 
+    // 2. 이 Hook은 생성 이벤트가 트리거될 때만 호출됨. 
+    UC_HOOK_EDGE_GENERATED = 1 << 15, 
+    // 특정 tcg 연산 코드를 Hook. 사용법은 UC_HOOK_INSN과 유사함. 
+    UC_HOOK_TCG_OPCODE = 1 << 16, 
+} uc_hook_type; 
+``` 
 
 </details>
 
 
-### hook_types
+### hook_types 
+매크로 정의 Hook 유형 
 
-宏定义Hook类型
+<details><summary> Code </summary> 
 
-<details><summary> Code </summary>
-
-```cpp
-// Hook 所有未映射内存访问的事件
-#define UC_HOOK_MEM_UNMAPPED (UC_HOOK_MEM_READ_UNMAPPED + UC_HOOK_MEM_WRITE_UNMAPPED + UC_HOOK_MEM_FETCH_UNMAPPED)
-// Hook 所有对受保护内存的非法访问事件
-#define UC_HOOK_MEM_PROT (UC_HOOK_MEM_READ_PROT + UC_HOOK_MEM_WRITE_PROT + UC_HOOK_MEM_FETCH_PROT)
-// Hook 所有非法读取存储器的事件
-#define UC_HOOK_MEM_READ_INVALID (UC_HOOK_MEM_READ_PROT + UC_HOOK_MEM_READ_UNMAPPED)
-// Hook 所有非法写入存储器的事件
-#define UC_HOOK_MEM_WRITE_INVALID (UC_HOOK_MEM_WRITE_PROT + UC_HOOK_MEM_WRITE_UNMAPPED)
-// Hook 所有非法获取内存的事件
-#define UC_HOOK_MEM_FETCH_INVALID (UC_HOOK_MEM_FETCH_PROT + UC_HOOK_MEM_FETCH_UNMAPPED)
-// Hook 所有非法的内存访问事件
-#define UC_HOOK_MEM_INVALID (UC_HOOK_MEM_UNMAPPED + UC_HOOK_MEM_PROT)
-// Hook 所有有效内存访问的事件
-// 注意: UC_HOOK_MEM_READ 在 UC_HOOK_MEM_READ_PROT 和 UC_HOOK_MEM_READ_UNMAPPED 之前触发 ,
-//       因此这个Hook可能会触发一些无效的读取。
-#define UC_HOOK_MEM_VALID (UC_HOOK_MEM_READ + UC_HOOK_MEM_WRITE + UC_HOOK_MEM_FETCH)
-```
+```cpp 
+// 모든 매핑되지 않은 메모리 접근 이벤트를 Hook 
+#define UC_HOOK_MEM_UNMAPPED (UC_HOOK_MEM_READ_UNMAPPED + UC_HOOK_MEM_WRITE_UNMAPPED + UC_HOOK_MEM_FETCH_UNMAPPED) 
+// 보호된 메모리에 대한 모든 잘못된 접근 이벤트를 Hook 
+#define UC_HOOK_MEM_PROT (UC_HOOK_MEM_READ_PROT + UC_HOOK_MEM_WRITE_PROT + UC_HOOK_MEM_FETCH_PROT) 
+// 모든 잘못된 메모리 읽기 이벤트를 Hook 
+#define UC_HOOK_MEM_READ_INVALID (UC_HOOK_MEM_READ_PROT + UC_HOOK_MEM_READ_UNMAPPED) 
+// 모든 잘못된 메모리 쓰기 이벤트를 Hook 
+#define UC_HOOK_MEM_WRITE_INVALID (UC_HOOK_MEM_WRITE_PROT + UC_HOOK_MEM_WRITE_UNMAPPED) 
+// 모든 잘못된 메모리 가져오기 이벤트를 Hook 
+#define UC_HOOK_MEM_FETCH_INVALID (UC_HOOK_MEM_FETCH_PROT + UC_HOOK_MEM_FETCH_UNMAPPED) 
+// 모든 잘못된 메모리 접근 이벤트를 Hook 
+#define UC_HOOK_MEM_INVALID (UC_HOOK_MEM_UNMAPPED + UC_HOOK_MEM_PROT) 
+// 모든 유효한 메모리 접근 이벤트를 Hook 
+// 참고: UC_HOOK_MEM_READ는 UC_HOOK_MEM_READ_PROT와 UC_HOOK_MEM_READ_UNMAPPED 전에 트리거되므로, 
+// 이 Hook은 일부 잘못된 읽기를 트리거할 수 있음. 
+#define UC_HOOK_MEM_VALID (UC_HOOK_MEM_READ + UC_HOOK_MEM_WRITE + UC_HOOK_MEM_FETCH) 
+``` 
 
 </details>
 
 
 ### uc_mem_region
+메모리 영역은 [uc_mem_map()](#uc_mem_map)과 [uc_mem_map_ptr()](#uc_mem_map_ptr)에 의해 매핑됩니다. 
+[uc_mem_regions()](#uc_mem_regions)를 사용하여 이 메모리 영역의 목록을 검색합니다.
 
-由[uc_mem_map()](#uc_mem_map)和[uc_mem_map_ptr()](#uc_mem_map_ptr)映射内存区域
-使用[uc_mem_regions()](#uc_mem_regions)检索该内存区域的列表
-
-<details><summary> Code </summary>
-
-```cpp
-typedef struct uc_mem_region {
-    uint64_t begin; // 区域起始地址 (包括)
-    uint64_t end;   // 区域结束地址 (包括)
-    uint32_t perms; // 区域的内存权限
-} uc_mem_region;
-```
-
+ <details><summary> Code </summary> 
+ 
+ ```cpp 
+ typedef struct uc_mem_region { 
+    uint64_t begin; // 영역 시작 주소 (포함) 
+    uint64_t end; // 영역 끝 주소 (포함) 
+    uint32_t perms; // 영역의 메모리 권한 
+} uc_mem_region; 
+``` 
 </details>
 
 
 ### uc_query_type
 
-[uc_query()](#uc_query)的所有查询类型参数
+[uc_query()](#uc_query)의 모든 쿼리 유형 매개변수 
 
 <details><summary> Code </summary>
 
 ```cpp
 typedef enum uc_query_type {
-    // 动态查询当前硬件模式
+    // 현재 하드웨어 모드를 동적으로 쿼리
     UC_QUERY_MODE = 1,
-    UC_QUERY_PAGE_SIZE, // 查询引擎实例的pagesize
-    UC_QUERY_ARCH,      // 查询引擎实例的架构类型
-    UC_QUERY_TIMEOUT,   // 查询是否由于超时停止模拟 (如果 result = True 则表示是)
+    UC_QUERY_PAGE_SIZE, // 엔진 인스턴스의 페이지 크기를 쿼리
+    UC_QUERY_ARCH, // 엔진 인스턴스의 아키텍처 유형을 쿼리
+    UC_QUERY_TIMEOUT, // 시뮬레이션이 타임아웃으로 인해 중지되었는지 쿼리 (result = True이면 타임아웃임을 나타냄)
 } uc_query_type;
 ```
-
 </details>
 
 
 ### uc_control_type
 
-[uc_ctl()](#uc_ctl)的所有查询类型参数
+[uc_ctl()](#uc_ctl)의 모든 쿼리 유형 매개변수
 
 <details><summary> Code </summary>
 
 ```cpp
-// uc_ctl 的实现与 Linux ioctl 较为类似但略有不同
+// uc_ctl의 구현은 Linux ioctl과 유사하지만 약간 다릅니다.
 //
-// uc_control_type 在 uc_ctl 中的组织结构如下:
+// uc_control_type은 uc_ctl에서 다음과 같이 구성됩니다:
 //
 //    R/W       NR       Reserved     Type
 //  [      ] [      ]  [         ] [       ]
 //  31    30 29     26 25       16 15      0
 //
-//  @R/W: 是否操作是一个读/写访问.
-//  @NR: 参数数量.
-//  @Reserved: 为0，为未来扩展保留.
-//  @Type: uc_control_type 中的枚举.
+// @R/W: 작업이 읽기/쓰기 액세스인지 여부.
+// @NR: 매개변수 수.
+// @Reserved: 0이며 향후 확장을 위해 예약됨.
+// @Type: uc_control_type의 열거형.
 
-// 无输入和输出参数.
+// 입력 및 출력 매개변수가 없습니다.
 #define UC_CTL_IO_NONE (0)
-// 仅有输入参数为了一个写操作.
+// 쓰기 작업을 위한 입력 매개변수만 있습니다.
 #define UC_CTL_IO_WRITE (1)
-// 仅有输出参数为了一个读操作.
+// 읽기 작업을 위한 출력 매개변수만 있습니다.
 #define UC_CTL_IO_READ (2)
-// 参数中同时包含读和写操作.
+// 매개변수에 읽기와 쓰기 작업이 모두 포함되어 있습니다.
 #define UC_CTL_IO_READ_WRITE (UC_CTL_IO_WRITE | UC_CTL_IO_READ)
 
 #define UC_CTL(type, nr, rw)                                                   \
@@ -548,52 +545,51 @@ typedef enum uc_query_type {
 ```
 
 ```cpp
-// 控制链以树状结构组织.
-// 如果一个控制状态没有为@args填入 `Set` 或 `Get`, 则是 r/o 或 w/o.
+// 제어는 트리 구조로 구성됩니다.
+// 제어 상태가 @args에 대해 `Set` 또는 `Get`을 지정하지 않으면 r/o 또는 w/o입니다.
 typedef enum uc_control_type {
-    // 当前模式.
+    // 현재 모드
     // Read: @args = (int*)
     UC_CTL_UC_MODE = 0,
-    // 当前 page size.
+    // 현재 page size.
     // Write: @args = (uint32_t)
     // Read: @args = (uint32_t*)
     UC_CTL_UC_PAGE_SIZE,
-    // 当前架构.
+    // 현재 아키텍쳐
     // Read: @args = (int*)
     UC_CTL_UC_ARCH,
-    // 当前超时.
+    // 현재 타임아웃
     // Read: @args = (uint64_t*)
     UC_CTL_UC_TIMEOUT,
-    // 允许存在多个退出点.
-    // 没有该控制状态, 读取/设置退出点将不能使用.
+    // 여러 개의 종료 지점을 허용합니다.
+    // 이 제어 상태가 없으면 종료 지점을 읽거나 설정할 수 없습니다.
     // Write: @args = (int)
     UC_CTL_UC_USE_EXITS,
-    // 当前输入数.
+    // 현재 입력 수
     // Read: @args = (size_t*)
     UC_CTL_UC_EXITS_CNT,
-    // 当前输入.
+    // 현재 입력
     // Write: @args = (uint64_t* exits, size_t len)
     //        @len = UC_CTL_UC_EXITS_CNT
     // Read: @args = (uint64_t* exits, size_t len)
     //       @len = UC_CTL_UC_EXITS_CNT
     UC_CTL_UC_EXITS,
 
-    // 设置uc实例的cpu模式.
+    // uc인스턴스의 CPU모드를 설정합니다.
     // Note this option can only be set before any Unicorn
     // API is called except for uc_open.
     // Write: @args = (int)
     // Read:  @args = (int*)
     UC_CTL_CPU_MODEL,
-    // 查询特定地址的 tb(翻译块) 缓存
+    // 특정 주소의 tb(변환 블록) 캐시를 쿼리합니다.
     // Read: @args = (uint64_t, uc_tb*)
     UC_CTL_TB_REQUEST_CACHE,
-    // 禁用特定地址的 tb(翻译块) 缓存
+    // 특정 주소의 tb(변환 블록) 캐시를 비활성화합니다.
     // Write: @args = (uint64_t, uint64_t)
     UC_CTL_TB_REMOVE_CACHE,
-    // 禁用所有的 tb(翻译块)
-    // 无参数
+    // 모든 tb(변환 블록)을 비활성화합니다.
+    // 매개변수 없음
     UC_CTL_TB_FLUSH
-
 } uc_control_type;
 ```
 
@@ -602,7 +598,7 @@ typedef enum uc_control_type {
 
 ### uc_context
 
-与uc_context_*()一起使用，管理CPU上下文的不透明存储
+uc_context_*() 함수와 함께 사용되며, CPU 컨텍스트의 불투명한 저장을 관리합니다.
 
 <details><summary> Code </summary>
 
@@ -616,17 +612,17 @@ typedef struct uc_context uc_context;
 
 ### uc_prot
 
-新映射区域的权限
+새로 매핑된 영역의 권한
 
 <details><summary> Code </summary>
 
 ```cpp
 typedef enum uc_prot {
-   UC_PROT_NONE = 0,    //无
-   UC_PROT_READ = 1,    //读取
-   UC_PROT_WRITE = 2,   //写入
-   UC_PROT_EXEC = 4,    //可执行
-   UC_PROT_ALL = 7,     //所有权限
+UC_PROT_NONE = 0, // 권한 없음
+UC_PROT_READ = 1, // 읽기
+UC_PROT_WRITE = 2, // 쓰기
+UC_PROT_EXEC = 4, // 실행 가능
+UC_PROT_ALL = 7, // 모든 권한
 } uc_prot;
 ```
 
@@ -701,24 +697,22 @@ typedef enum uc_prot {
 unsigned int uc_version(unsigned int *major, unsigned int *minor);
 ```
 
-用于返回Unicorn API主次版本信息
-
+Unicorn API의 주 버전과 부 버전 정보를 반환하는 데 사용됩니다.
 ```
-@major: API主版本号
-@minor: API次版本号
-@return 16进制数，计算方式 (major << 8 | minor)
-
-提示: 该返回值可以和宏UC_MAKE_VERSION比较
+@major: API 주 버전 번호
+@minor: API 부 버전 번호
+@return 16진수, 계산 방식: (major << 8 | minor)
+힌트: 이 반환값은 UC_MAKE_VERSION 매크로와 비교할 수 있습니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 unsigned int uc_version(unsigned int *major, unsigned int *minor)
 {
     if (major != NULL && minor != NULL) {
-        *major = UC_API_MAJOR;  //宏
-        *minor = UC_API_MINOR;  //宏
+        *major = UC_API_MAJOR;  //매크로
+        *minor = UC_API_MINOR;  //매크로
     }
 
     return (UC_API_MAJOR << 8) + UC_API_MINOR;   //(major << 8 | minor)
@@ -728,9 +722,9 @@ unsigned int uc_version(unsigned int *major, unsigned int *minor)
 </details>
 
 
-编译后不可更改，不接受自定义版本
+컴파일 후에는 변경할 수 없으며, 사용자 정의 버전을 허용하지 않습니다.
 
-使用示例：
+사용 예시:
 
 ```cpp
 #include <iostream>
@@ -746,11 +740,11 @@ int main()
 }
 ```
 
-输出：
+출력：
 
 ![image.png](API_Doc_Pic/1_8.png)
 
-得到版本号1.0.0
+버전 번호 얻기1.0.0
 
 
 
@@ -760,14 +754,14 @@ int main()
 bool uc_arch_supported(uc_arch arch);
 ```
 
-确定Unicorn是否支持当前架构
+현재 아키텍처가 Unicorn에서 지원되는지 확인
 
 ```
- @arch: 架构类型 (UC_ARCH_*)
- @return 如果支持返回True
+ @arch: 아키텍처 유형 (UC_ARCH_*)
+ @return 지원되는 경우 True 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 bool uc_arch_supported(uc_arch arch)
@@ -794,7 +788,7 @@ bool uc_arch_supported(uc_arch arch)
 #ifdef UNICORN_HAS_X86
         case UC_ARCH_X86:   return true;
 #endif
-        /* 无效或禁用架构 */
+        /* 잘못되었거나 지원하지 않는 아키텍처 */
         default:            return false;
     }
 }
@@ -803,7 +797,7 @@ bool uc_arch_supported(uc_arch arch)
 </details>
 
 
-使用示例：
+사용 예시：
 
 ```cpp
 #include <iostream>
@@ -812,12 +806,12 @@ using namespace std;
 
 int main()
 {
-    cout << "是否支持UC_ARCH_X86架构：" << uc_arch_supported(UC_ARCH_X86) << endl;
+    cout << "UC_ARCH_X86아키텍처 지원 여부：" << uc_arch_supported(UC_ARCH_X86) << endl;
     return 0;
 }
 ```
 
-输出：
+출력：
 
 ![image.png](API_Doc_Pic/1_9.png)
 
@@ -829,17 +823,17 @@ int main()
 uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **uc);
 ```
 
-创建新的Unicorn实例
+새로운 Unicorn 인스턴스 생성
 
 ```
-@arch: 架构类型 (UC_ARCH_*)
-@mode: 硬件模式. 由 UC_MODE_* 组合
-@uc: 指向 uc_engine 的指针, 返回时更新
+@arch: 아키텍처 유형 (UC_ARCH_)
+@mode: 하드웨어 모드. UC_MODE_ 값들의 조합
+@uc: uc_engine 포인터, 반환 시 업데이트됨
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 유형 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
@@ -847,9 +841,9 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
     struct uc_struct *uc;
 
     if (arch < UC_ARCH_MAX) {
-        uc = calloc(1, sizeof(*uc));  //申请内存
+        uc = calloc(1, sizeof(*uc));  //메모리 할당
         if (!uc) {
-            // 内存不足
+            // 메모리 부족
             return UC_ERR_NOMEM;
         }
 
@@ -857,7 +851,7 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
         uc->arch = arch;
         uc->mode = mode;
 
-        // 初始化
+        // 초기화
         // uc->ram_list = { .blocks = QTAILQ_HEAD_INITIALIZER(ram_list.blocks) };
         uc->ram_list.blocks.tqh_first = NULL;
         uc->ram_list.blocks.tqh_last = &(uc->ram_list.blocks.tqh_first);
@@ -868,7 +862,7 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
         uc->address_spaces.tqh_first = NULL;
         uc->address_spaces.tqh_last = &uc->address_spaces.tqh_first;
 
-        switch(arch) {   // 根据架构进行预处理
+        switch(arch) {   // 아키텍처에 따른 전처리
             default:
                 break;
 #ifdef UNICORN_HAS_M68K
@@ -938,7 +932,7 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
                     if (mode & UC_MODE_MIPS64)
                         uc->init_arch = mips64_uc_init;
 #endif
-                } else {    // 小端序
+                } else {    // LITTLE ENDIAN
 #ifdef UNICORN_HAS_MIPSEL
                     if (mode & UC_MODE_MIPS32)
                         uc->init_arch = mipsel_uc_init;
@@ -989,9 +983,9 @@ uc_err uc_open(uc_arch arch, uc_mode mode, uc_engine **result)
 </details>
 
 
-**注意： uc_open会申请堆内存，使用完必须用uc_close释放，否则会发生泄露**
+**주의: uc_open은 힙 메모리를 할당하므로, 사용 후에는 반드시 uc_close로 해제해야 합니다. 그렇지 않으면 메모리 누수가 발생할 수 있습니다.**
 
-使用示例：
+사용 예시：
 
 ```cpp
 #include <iostream>
@@ -1003,7 +997,7 @@ int main()
     uc_engine* uc;
     uc_err err;
 
-    //// 初始化 X86-32bit 模式模拟器
+    //// X86-32비트 모드 에뮬레이터 초기화
     err = uc_open(UC_ARCH_X86, UC_MODE_32, &uc);
     if (err != UC_ERR_OK) {
         printf("Failed on uc_open() with error returned: %u\n", err);
@@ -1011,9 +1005,9 @@ int main()
     }
 
     if (!err)
-        cout << "uc引擎创建成功" << endl;
+        cout << "uc엔진 생성 성공" << endl;
 
-    //// 关闭uc
+    //// uc종료
     err = uc_close(uc);
     if (err != UC_ERR_OK) {
         printf("Failed on uc_close() with error returned: %u\n", err);
@@ -1021,13 +1015,13 @@ int main()
     }
 
     if (!err)
-        cout << "uc引擎关闭成功" << endl;
+        cout << "uc엔진이 성공적으로 종료됨" << endl;
 
     return 0;
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_10.png)
 
@@ -1039,15 +1033,15 @@ int main()
 uc_err uc_close(uc_engine *uc);
 ```
 
-关闭一个uc实例，将释放内存。关闭后无法恢复。
+uc 인스턴스를 종료하면 메모리가 해제됩니다. 종료 후에는 복구할 수 없습니다.
 
 ```
-@uc: 指向由 uc_open() 返回的指针
+@uc: uc_open()이 반환한 포인터
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공시 UC_ERR_OK 반환, 그렇지 않은 경우 uc_err 열거형의 다른 오류 유형 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_close(uc_engine *uc)
@@ -1056,16 +1050,16 @@ uc_err uc_close(uc_engine *uc)
     struct list_item *cur;
     struct hook *hook;
 
-    // 清理内部数据
+    // 내부 데이터 정리
     if (uc->release)
         uc->release(uc->tcg_ctx);
     g_free(uc->tcg_ctx);
 
-    // 清理 CPU.
+    // CPU 정리.
     g_free(uc->cpu->tcg_as_listener);
     g_free(uc->cpu->thread);
 
-    // 清理所有 objects.
+    // 모든 objects 정리.
     OBJECT(uc->machine_state->accelerator)->ref = 1;
     OBJECT(uc->machine_state)->ref = 1;
     OBJECT(uc->owner)->ref = 1;
@@ -1079,14 +1073,14 @@ uc_err uc_close(uc_engine *uc)
     object_unref(uc, OBJECT(&uc->io_mem_rom));
     object_unref(uc, OBJECT(uc->root));
 
-    // 释放内存
+    // 메모리 해제
     g_free(uc->system_memory);
 
-    // 释放相关线程
+    // 관련 스레드 해제
     if (uc->qemu_thread_data)
         g_free(uc->qemu_thread_data);
 
-    // 释放其他数据
+    // 기타 데이터 해제
     free(uc->l1_map);
 
     if (uc->bounce.buffer) {
@@ -1100,10 +1094,10 @@ uc_err uc_close(uc_engine *uc)
         free(uc->ram_list.dirty_memory[i]);
     }
 
-    // 释放hook和hook列表
+    // hook과 hook리스트를 해제
     for (i = 0; i < UC_HOOK_MAX; i++) {
         cur = uc->hook[i].head;
-        // hook 可存在于多个列表，可通过计数获取释放的时间
+        // hook은 여러 리스트에 존재할 수 있으며, 카운트를 통해 해제 시점을 결정할 수 있습니다.
         while (cur) {
             hook = (struct hook *)cur->data;
             if (--hook->refs == 0) {
@@ -1116,7 +1110,7 @@ uc_err uc_close(uc_engine *uc)
 
     free(uc->mapped_blocks);
 
-    // 最后释放uc自身
+    // 마지막으로 uc자체를 해제
     memset(uc, 0, sizeof(*uc));
     free(uc);
 
@@ -1126,7 +1120,7 @@ uc_err uc_close(uc_engine *uc)
 
 </details>
 
-使用实例同[uc_open()](#uc_open)
+사용예제는 [uc_open()](#uc_open)과 같습니다
 
 
 
@@ -1136,18 +1130,18 @@ uc_err uc_close(uc_engine *uc)
 uc_err uc_query(uc_engine *uc, uc_query_type type, size_t *result);
 ```
 
-查询引擎的内部状态
+엔진의 내부 상태를 쿼리합니다
 
 ```
- @uc: uc_open() 返回的句柄
- @type: uc_query_type 中枚举的类型
-
- @result: 保存被查询的内部状态的指针
-
- @return: 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+ @uc: uc_open()에서 반환된 핸들
+ @type: uc_query_type 열거형의 타입
+ 
+ @result: 조회된 내부 상태를 저장할 포인터
+ 
+ @return: 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_query(uc_engine *uc, uc_query_type type, size_t *result)
@@ -1177,7 +1171,7 @@ uc_err uc_query(uc_engine *uc, uc_query_type type, size_t *result)
 
 </details>
 
-使用示例：
+사용예시：
 
 ```cpp
 #include <iostream>
@@ -1195,12 +1189,12 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例创建成功" << endl;
+        cout << "uc인스턴스 생성 성공" << endl;
 
     size_t result[] = {0};
-    err = uc_query(uc, UC_QUERY_ARCH, result);   // 查询架构
+    err = uc_query(uc, UC_QUERY_ARCH, result);   // 아키텍쳐 조회
     if (!err)
-        cout << "查询成功: " << *result << endl;
+        cout << "조회 성공: " << *result << endl;
 
     err = uc_close(uc);
     if (err != UC_ERR_OK) {
@@ -1208,17 +1202,17 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例关闭成功" << endl;
+        cout << "uc 인스턴스가 성공적으로 종료되었습니다." << endl;
 
     return 0;
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_11.png)
 
-架构查询结果为4，对应的正是UC_ARCH_X86
+아키텍처 조회 결과가 4이며, 이는 UC_ARCH_X86에 해당합니다.
 
 
 
@@ -1228,15 +1222,15 @@ int main()
 uc_err uc_errno(uc_engine *uc);
 ```
 
-当某个API函数失败时，报告最后的错误号，一旦被访问，uc_errno可能不会保留原来的值。
+어떤 API 함수가 실패할 때, 마지막 오류 번호를 보고합니다. 일단 액세스되면 uc_errno는 원래 값을 유지하지 않을 수 있습니다.
 
 ```
-@uc: uc_open() 返回的句柄
+@uc: uc_open()가 반환한 핸들
 
-@return: 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return: 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_errno(uc_engine *uc)
@@ -1247,7 +1241,7 @@ uc_err uc_errno(uc_engine *uc)
 
 </details>
 
-使用示例：
+사용 예시：
 
 ```cpp
 #include <iostream>
@@ -1265,10 +1259,10 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例创建成功" << endl;
+        cout << "uc인스턴스 생성 성공" << endl;
 
     err = uc_errno(uc);
-    cout << "错误号： " << err << endl;
+    cout << "오류 번호： " << err << endl;
 
     err = uc_close(uc);
     if (err != UC_ERR_OK) {
@@ -1276,17 +1270,17 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例关闭成功" << endl;
+        cout << "uc 인스턴스가 성공적으로 종료 되었습니다" << endl;
 
     return 0;
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_12.png)
 
-无错误，输出错误号为0
+오류가 없으므로 출력된 오류 번호는 0입니다.
 
 
 
@@ -1296,15 +1290,15 @@ int main()
 const char *uc_strerror(uc_err code);
 ```
 
-返回给定错误号的解释
+주어진 오류 번호에 대한 설명을 반환합니다.
 
 ```
- @code: 错误号
+ @code: 오류 번호
 
- @return: 指向给定错误号的解释的字符串指针
+ @return: 주어진 오류 번호에 대한 설명이 담긴 문자열 포인터
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```cpp
 const char *uc_strerror(uc_err code)
@@ -1362,7 +1356,7 @@ const char *uc_strerror(uc_err code)
 
 </details>
 
-使用示例：
+사용예시：
 
 ```cpp
 #include <iostream>
@@ -1380,10 +1374,10 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例创建成功" << endl;
+        cout << "uc 인스턴스 생성 성공" << endl;
 
     err = uc_errno(uc);
-    cout << "错误号： " << err << "  错误描述： " << uc_strerror(err) <<endl;
+    cout << "오류번호： " << err << "  오류 내용： " << uc_strerror(err) <<endl;
 
     err = uc_close(uc);
     if (err != UC_ERR_OK) {
@@ -1391,13 +1385,13 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例关闭成功" << endl;
+        cout << "uc인스턴스를 성공적으로 종료했습니다." << endl;
 
     return 0;
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_13.png)
 
@@ -1409,17 +1403,17 @@ int main()
 uc_err uc_reg_write(uc_engine *uc, int regid, const void *value);
 ```
 
-将值写入寄存器
+값을 레지스터에 쓰기
 
 ```
-@uc: uc_open()返回的句柄
-@regid:  将被修改的寄存器ID
-@value:  指向寄存器将被修改成的值的指针
+@uc: uc_open()에서 반환된 핸들
+@regid: 수정될 레지스터의 ID
+@value: 레지스터가 수정될 값의 포인터
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공하면 UC_ERR_OK를 반환하고, 그렇지 않으면 uc_err 열거형의 다른 오류 코드를 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_reg_write(uc_engine *uc, int regid, const void *value)
@@ -1441,7 +1435,7 @@ uc_err uc_reg_write_batch(uc_engine *uc, int *ids, void *const *vals, int count)
 
 </details>
 
-使用示例：
+사용예시：
 
 ```cpp
 #include <iostream>
@@ -1459,12 +1453,12 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例创建成功" << endl;
+        cout << "uc인스턴스 생성 성공" << endl;
 
     int r_eax = 0x12;
     err = uc_reg_write(uc, UC_X86_REG_ECX, &r_eax);
     if (!err)
-        cout << "写入成功: " << r_eax << endl;
+        cout << "쓰기 성공: " << r_eax << endl;
 
     err = uc_close(uc);
     if (err != UC_ERR_OK) {
@@ -1472,13 +1466,13 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例关闭成功" << endl;
+        cout << "uc인스턴스가 성공적으로 종료되었습니다." << endl;
 
     return 0;
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_14.png)
 
@@ -1490,17 +1484,17 @@ int main()
 uc_err uc_reg_read(uc_engine *uc, int regid, void *value);
 ```
 
-读取寄存器的值
+레지스터 값 읽기
 
 ```
-@uc: uc_open()返回的句柄
-@regid:  将被读取的寄存器ID
-@value:  指向保存寄存器值的指针
+@uc: uc_open()가 반환한 핸들
+@regid:  읽을 레지스터의 ID
+@value:  레지스터의 값을 저장할 포인터
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공하면 UC_ERR_OK를 반환하고, 그렇지 않으면 uc_err 열거형의 다른 오류 코드를 반환합니다
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_reg_read(uc_engine *uc, int regid, void *value)
@@ -1521,7 +1515,7 @@ uc_err uc_reg_read_batch(uc_engine *uc, int *ids, void **vals, int count)
 
 </details>
 
-使用示例：
+사용예시：
 
 ```cpp
 #include <iostream>
@@ -1539,17 +1533,17 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例创建成功" << endl;
+        cout << "uc인스턴스 생성 성공" << endl;
 
     int r_eax = 0x12;
     err = uc_reg_write(uc, UC_X86_REG_ECX, &r_eax);
     if (!err)
-        cout << "写入成功: " << r_eax << endl;
+        cout << "쓰기 성공: " << r_eax << endl;
 
     int recv_eax;
     err = uc_reg_read(uc, UC_X86_REG_ECX, &recv_eax);
     if (!err)
-        cout << "读取成功: " << recv_eax << endl;
+        cout << "읽기 성공: " << recv_eax << endl;
 
     err = uc_close(uc);
     if (err != UC_ERR_OK) {
@@ -1557,13 +1551,13 @@ int main()
         return -1;
     }
     if (!err)
-        cout << "uc实例关闭成功" << endl;
+        cout << "uc인스턴스가 성공적으로 종료 되었습니다" << endl;
 
     return 0;
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_15.png)
 
