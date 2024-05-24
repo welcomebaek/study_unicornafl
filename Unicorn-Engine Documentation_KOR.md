@@ -1569,18 +1569,18 @@ int main()
 uc_err uc_reg_write_batch(uc_engine *uc, int *regs, void *const *vals, int count);
 ```
 
-同时将多个值写入多个寄存器
+여러 레지스터에 동시에 여러 값 쓰기
 
 ```
-@uc: uc_open()返回的句柄
-@regid:  存储将被写入的多个寄存器ID的数组
-@value:  指向保存多个值的数组的指针
-@count: *regs 和 *vals 数组的长度
+@uc: uc_open()에서 반환된 핸들
+@regid: 쓰기 작업이 수행될 여러 레지스터 ID를 저장하는 배열
+@value: 여러 값을 저장하는 배열을 가리키는 포인터
+@count: *regs와 *vals 배열의 길이
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_reg_write_batch(uc_engine *uc, int *ids, void *const *vals, int count)
@@ -1597,7 +1597,7 @@ uc_err uc_reg_write_batch(uc_engine *uc, int *ids, void *const *vals, int count)
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 #include <iostream>
@@ -1665,7 +1665,7 @@ int main()
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_16.png)
 
@@ -1677,18 +1677,18 @@ int main()
 uc_err uc_reg_read_batch(uc_engine *uc, int *regs, void **vals, int count);
 ```
 
-同时读取多个寄存器的值。
+여러 레지스터의 값을 동시에 읽기.
 
 ```
-@uc: uc_open()返回的句柄
-@regid:  存储将被读取的多个寄存器ID的数组
-@value:  指向保存多个值的数组的指针
-@count: *regs 和 *vals 数组的长度
+@uc: uc_open()에서 반환된 핸들
+@regid: 읽기 작업이 수행될 여러 레지스터 ID를 저장하는 배열
+@value: 여러 값을 저장할 배열을 가리키는 포인터
+@count: *regs와 *vals 배열의 길이
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_reg_read_batch(uc_engine *uc, int *ids, void **vals, int count)
@@ -1704,7 +1704,7 @@ uc_err uc_reg_read_batch(uc_engine *uc, int *ids, void **vals, int count)
 
 </details>
 
-使用示例同uc_reg_write_batch()。
+사용 예시는 uc_reg_write_batch()와 같다.
 
 
 
@@ -1714,20 +1714,20 @@ uc_err uc_reg_read_batch(uc_engine *uc, int *ids, void **vals, int count)
 uc_err uc_mem_write(uc_engine *uc, uint64_t address, const void *bytes, size_t size);
 ```
 
-在内存中写入一段字节码。
+메모리에 바이트 코드 한 부분을 씁니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@address: 写入字节的起始地址
-@bytes:   指向一个包含要写入内存的数据的指针
-@size:   要写入的内存大小。
+@uc: uc_open()에서 반환된 핸들
+@address: 바이트를 쓰기 시작할 주소
+@bytes: 메모리에 쓸 데이터를 포함하는 포인터
+@size: 쓰려는 메모리의 크기.
 
-注意: @bytes 必须足够大以包含 @size 字节。
+참고: @bytes는 @size 바이트를 포함할 수 있을 만큼 충분히 커야 합니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_mem_write(uc_engine *uc, uint64_t address, const void *_bytes, size_t size)
@@ -1742,27 +1742,27 @@ uc_err uc_mem_write(uc_engine *uc, uint64_t address, const void *_bytes, size_t 
     if (!check_mem_area(uc, address, size))
         return UC_ERR_WRITE_UNMAPPED;
 
-    // 内存区域可以重叠相邻的内存块
+    // 메모리 영역은 인접한 메모리 블록과 겹칠 수 있습니다.
     while(count < size) {
         MemoryRegion *mr = memory_mapping(uc, address);
         if (mr) {
             uint32_t operms = mr->perms;
-            if (!(operms & UC_PROT_WRITE)) // 没有写保护
-                // 标记为可写
+            if (!(operms & UC_PROT_WRITE)) // 쓰기 보호가 없습니다
+                // 쓰기 가능으로 표시합니다
                 uc->readonly_mem(mr, false);
 
             len = (size_t)MIN(size - count, mr->end - address);
             if (uc->write_mem(&uc->as, address, bytes, len) == false)
                 break;
 
-            if (!(operms & UC_PROT_WRITE)) // 没有写保护
-                // 设置写保护
+            if (!(operms & UC_PROT_WRITE)) // 쓰기 보호가 없습니다
+                // 쓰기 보호를 설정합니다
                 uc->readonly_mem(mr, true);
 
             count += len;
             address += len;
             bytes += len;
-        } else  // 此地址尚未被映射
+        } else  // 이 주소는 아직 매핑되지 않았습니다.
             break;
     }
 
@@ -1775,7 +1775,7 @@ uc_err uc_mem_write(uc_engine *uc, uint64_t address, const void *_bytes, size_t 
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 #include <iostream>
@@ -1822,7 +1822,7 @@ int main()
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_17.png)
 
@@ -1834,20 +1834,20 @@ int main()
 uc_err uc_mem_read(uc_engine *uc, uint64_t address, void *bytes, size_t size);
 ```
 
-从内存中读取字节。
+메모리에서 바이트를 읽습니다.
 
 ```
- @uc: uc_open() 返回的句柄
- @address: 读取字节的起始地址
- @bytes:   指向一个包含要读取内存的数据的指针
- @size:   要读取的内存大小。
-
- 注意: @bytes 必须足够大以包含 @size 字节。
-
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+ @uc: uc_open()에서 반환된 핸들
+ @address: 바이트를 읽기 시작할 주소
+ @bytes: 메모리에서 읽은 데이터를 포함할 포인터
+ @size: 읽으려는 메모리의 크기.
+ 
+ 참고: @bytes는 @size 바이트를 포함할 수 있을 만큼 충분히 커야 합니다.
+ 
+ @return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_mem_read(uc_engine *uc, uint64_t address, void *_bytes, size_t size)
@@ -1862,7 +1862,7 @@ uc_err uc_mem_read(uc_engine *uc, uint64_t address, void *_bytes, size_t size)
     if (!check_mem_area(uc, address, size))
         return UC_ERR_READ_UNMAPPED;
 
-    // 内存区域可以重叠相邻的内存块
+    // 메모리 영역은 인접한 메모리 블록과 겹칠 수 있습니다.
     while(count < size) {
         MemoryRegion *mr = memory_mapping(uc, address);
         if (mr) {
@@ -1872,7 +1872,7 @@ uc_err uc_mem_read(uc_engine *uc, uint64_t address, void *_bytes, size_t size)
             count += len;
             address += len;
             bytes += len;
-        } else  // 此地址尚未被映射
+        } else  // 이 주소는 아직 매핑되지 않았습니다.
             break;
     }
 
@@ -1885,7 +1885,7 @@ uc_err uc_mem_read(uc_engine *uc, uint64_t address, void *_bytes, size_t size)
 
 </details>
 
-使用示例同[uc_mem_write()](#uc_mem_write)
+사용예시는 [uc_mem_write()](#uc_mem_write)와 같습니다
 
 
 
@@ -1895,24 +1895,24 @@ uc_err uc_mem_read(uc_engine *uc, uint64_t address, void *_bytes, size_t size)
 uc_err uc_emu_start(uc_engine *uc, uint64_t begin, uint64_t until, uint64_t timeout, size_t count);
 ```
 
-在指定的时间内模拟机器码。
+지정된 시간 동안 기계어를 에뮬레이션합니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@begin: 开始模拟的地址
-@until: 模拟停止的地址 (当到达该地址时)
-@timeout: 模拟代码的持续时间(以微秒计)。当这个值为0时，将无时间限制模拟代码，直到模拟完成。
-@count: 要模拟的指令数。当这个值为0时，将模拟所有可执行的代码，直到模拟完成
+@uc: uc_open()에서 반환된 핸들
+@begin: 에뮬레이션을 시작할 주소
+@until: 에뮬레이션이 중단되는 주소 (해당 주소에 도달했을 때)
+@timeout: 에뮬레이션 코드의 지속 시간(마이크로초 단위). 이 값이 0이면 에뮬레이션이 완료될 때까지 시간 제한 없이 코드를 에뮬레이션합니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@count: 에뮬레이션할 명령어 수. 이 값이 0이면 에뮬레이션이 완료될 때까지 실행 가능한 모든 코드를 에뮬레이션합니다.
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_emu_start(uc_engine* uc, uint64_t begin, uint64_t until, uint64_t timeout, size_t count)
 {
-    // 重制计数器
+    // 카운터 초기화
     uc->emu_counter = 0;
     uc->invalid_error = UC_ERR_OK;
     uc->block_full = false;
@@ -1937,7 +1937,7 @@ uc_err uc_emu_start(uc_engine* uc, uint64_t begin, uint64_t until, uint64_t time
                     uint16_t cs;
 
                     uc_reg_read(uc, UC_X86_REG_CS, &cs);
-                    // 抵消后面增加的 IP 和 CS
+                    // IP와 CS 증가분 상쇄
                     ip = begin - cs*16;
                     uc_reg_write(uc, UC_X86_REG_IP, &ip);
                     break;
@@ -1978,18 +1978,18 @@ uc_err uc_emu_start(uc_engine* uc, uint64_t begin, uint64_t until, uint64_t time
     uc->stop_request = false;
 
     uc->emu_count = count;
-    // 如果不需要计数，则移除计数挂钩hook
+    // 카운트가 필요하지 않은 경우, 카운트 훅을 제거합니다.
     if (count <= 0 && uc->count_hook != 0) {
         uc_hook_del(uc, uc->count_hook);
         uc->count_hook = 0;
     }
-    // 设置计数hook记录指令数
+    // 명령어 수를 기록하기 위해 카운트 훅을 설정합니다.
     if (count > 0 && uc->count_hook == 0) {
         uc_err err;
-        // 对计数指令的回调必须在所有其他操作之前运行，因此必须在hook列表的开头插入hook，而不是附加hook
+        // 카운트 명령어에 대한 콜백은 다른 모든 작업 전에 실행되어야 하므로, 훅을 훅 리스트의 끝에 추가하는 것이 아니라 시작 부분에 삽입해야 합니다.
         uc->hook_insert = 1;
         err = uc_hook_add(uc, &uc->count_hook, UC_HOOK_CODE, hook_count_cb, NULL, 1, 0);
-        // 恢复到 uc_hook_add()
+        // uc_hook_add()로 복원합니다
         uc->hook_insert = 0;
         if (err != UC_ERR_OK) {
             return err;
@@ -2005,11 +2005,11 @@ uc_err uc_emu_start(uc_engine* uc, uint64_t begin, uint64_t until, uint64_t time
         return UC_ERR_RESOURCE;
     }
 
-    // 模拟完成
+    // 에뮬레이션 완료
     uc->emulation_done = true;
 
     if (timeout) {
-        // 等待超时
+        // 대기 중 타임아웃 발생
         qemu_thread_join(&uc->timer);
     }
 
@@ -2022,7 +2022,7 @@ uc_err uc_emu_start(uc_engine* uc, uint64_t begin, uint64_t until, uint64_t time
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 #include <iostream>
@@ -2075,7 +2075,7 @@ int main()
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_18.png)
 
@@ -2087,17 +2087,18 @@ int main()
 uc_err uc_emu_stop(uc_engine *uc);
 ```
 
-停止模拟
+에뮬레이션 중지. 
 
-通常是从通过 tracing API注册的回调函数中调用。
+일반적으로 추적 API를 통해 등록된 콜백 함수에서 호출됩니다.
+
 
 ```
-@uc: uc_open() 返回的句柄
+@uc: uc_open()에서 반환된 핸들
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_emu_stop(uc_engine *uc)
@@ -2108,7 +2109,7 @@ uc_err uc_emu_stop(uc_engine *uc)
     uc->stop_request = true;
 
     if (uc->current_cpu) {
-        // 退出当前线程
+        // 현재 스레드 종료
         cpu_exit(uc->current_cpu);
     }
 
@@ -2118,7 +2119,7 @@ uc_err uc_emu_stop(uc_engine *uc)
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 uc_emu_stop(uc);
@@ -2133,25 +2134,25 @@ uc_err uc_hook_add(uc_engine *uc, uc_hook *hh, int type, void *callback,
         void *user_data, uint64_t begin, uint64_t end, ...);
 ```
 
-注册hook事件的回调，当hook事件被触发将会进行回调。
+hook 이벤트의 콜백을 등록합니다. hook 이벤트가 트리거되면 콜백이 호출됩니다.
 
 ```
- @uc: uc_open() 返回的句柄
- @hh: 注册hook得到的句柄. uc_hook_del() 中使用
- @type: hook 类型
- @callback: 当指令被命中时要运行的回调
- @user_data: 用户自定义数据. 将被传递给回调函数的最后一个参数 @user_data
- @begin: 回调生效区域的起始地址(包括)
- @end: 回调生效区域的结束地址(包括)
-   注意 1: 只有回调的地址在[@begin, @end]中才会调用回调
-   注意 2: 如果 @begin > @end, 每当触发此hook类型时都会调用回调
- @...: 变量参数 (取决于 @type)
-   注意: 如果 @type = UC_HOOK_INSN, 这里是指令ID (如: UC_X86_INS_OUT)
-
- @return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+ @uc: uc_open()에서 반환된 핸들
+ @hh: 등록된 hook에서 얻은 핸들. uc_hook_del()에서 사용됨
+ @type: hook 유형
+ @callback: 명령어가 일치할 때 실행할 콜백 함수
+ @user_data: 사용자 정의 데이터. 콜백 함수의 마지막 인자로 전달됨
+ @begin: 콜백이 적용되는 영역의 시작 주소(포함)
+ @end: 콜백이 적용되는 영역의 끝 주소(포함)  
+  주의 1: 콜백은 주소가 [@begin, @end] 범위 내에 있는 경우에만 호출됨
+  주의 2: @begin > @end인 경우, 이 hook 유형이 트리거될 때마다 콜백이 호출됨
+ @...: 가변 인자 (@type에 따라 다름)
+  주의: @type = UC_HOOK_INSN인 경우, 여기에는 명령어 ID(예: UC_X86_INS_OUT)가 옴
+ 
+ @return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_hook_add(uc_engine *uc, uc_hook *hh, int type, void *callback,
@@ -2173,7 +2174,7 @@ uc_err uc_hook_add(uc_engine *uc, uc_hook *hh, int type, void *callback,
     hook->refs = 0;
     *hh = (uc_hook)hook;
 
-    // UC_HOOK_INSN 有一个额外参数：指令ID
+    // UC_HOOK_INSN은 추가 인자가 있습니다: 명령어 ID
     if (type & UC_HOOK_INSN) {
         va_list valist;
 
@@ -2238,7 +2239,7 @@ uc_err uc_hook_add(uc_engine *uc, uc_hook *hh, int type, void *callback,
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 #include <iostream>
@@ -2351,11 +2352,11 @@ int main()
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_19.png)
 
-对每条指令都进行hook
+모든 명령어에 대해 hook을 적용합니다
 
 
 
@@ -2365,16 +2366,16 @@ int main()
 uc_err uc_hook_del(uc_engine *uc, uc_hook hh);
 ```
 
-删除一个已注册的hook事件
-
+등록된 hook 이벤트를 제거합니다.
 ```
-@uc: uc_open() 返回的句柄
-@hh: uc_hook_add() 返回的句柄
+@uc: uc_open()에서 반환된 핸들
+@hh: uc_hook_add()에서 반환된 핸들
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_hook_del(uc_engine *uc, uc_hook hh)
@@ -2396,7 +2397,7 @@ uc_err uc_hook_del(uc_engine *uc, uc_hook hh)
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 if ((err = uc_hook_add(uc, &sys_hook, UC_HOOK_CODE, hook_syscall, NULL, 1, 0))) {
@@ -2418,18 +2419,18 @@ if ((err = uc_hook_del(uc, &sys_hook))) {
 uc_err uc_mem_map(uc_engine *uc, uint64_t address, size_t size, uint32_t perms);
 ```
 
-为模拟映射一块内存。
+에뮬레이션을 위해 메모리 블록을 매핑합니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@address: 要映射到的新内存区域的起始地址。这个地址必须与4KB对齐，否则将返回UC_ERR_ARG错误。
-@size: 要映射到的新内存区域的大小。这个大小必须是4KB的倍数，否则将返回UC_ERR_ARG错误。
-@perms: 新映射区域的权限。参数必须是UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC或这些的组合，否则返回UC_ERR_ARG错误。
+@uc: uc_open()에서 반환된 핸들
+@address: 매핑할 새로운 메모리 영역의 시작 주소. 이 주소는 4KB로 정렬되어야 합니다. 그렇지 않으면 UC_ERR_ARG 오류가 반환됩니다.
+@size: 매핑할 새로운 메모리 영역의 크기. 이 크기는 4KB의 배수여야 합니다. 그렇지 않으면 UC_ERR_ARG 오류가 반환됩니다.
+@perms: 새로 매핑된 영역의 권한. 인자는 UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC 또는 이들의 조합이어야 합니다. 그렇지 않으면 UC_ERR_ARG 오류가 반환됩니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 UC_ERR_OK 반환, 그렇지 않으면 uc_err 열거형의 다른 오류 타입 반환
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_mem_map(uc_engine *uc, uint64_t address, size_t size, uint32_t perms)
@@ -2440,7 +2441,7 @@ uc_err uc_mem_map(uc_engine *uc, uint64_t address, size_t size, uint32_t perms)
         address = uc->mem_redirect(address);
     }
 
-    res = mem_map_check(uc, address, size, perms);    //内存安全检查
+    res = mem_map_check(uc, address, size, perms);    //메모리 안전성 검사
     if (res)
         return res;
 
@@ -2450,7 +2451,7 @@ uc_err uc_mem_map(uc_engine *uc, uint64_t address, size_t size, uint32_t perms)
 
 </details>
 
-使用示例同 [uc_hook_add()](#uc_hook_add)
+상용예시는 [uc_hook_add()](#uc_hook_add)와 같습니다
 
 
 
@@ -2460,19 +2461,19 @@ uc_err uc_mem_map(uc_engine *uc, uint64_t address, size_t size, uint32_t perms)
 uc_err uc_mem_map_ptr(uc_engine *uc, uint64_t address, size_t size, uint32_t perms, void *ptr);
 ```
 
-在模拟中映射现有的主机内存。
+기존 호스트 메모리를 시뮬레이션에서 매핑합니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@address: 要映射到的新内存区域的起始地址。这个地址必须与4KB对齐，否则将返回UC_ERR_ARG错误。
-@size: 要映射到的新内存区域的大小。这个大小必须是4KB的倍数，否则将返回UC_ERR_ARG错误。
-@perms: 新映射区域的权限。参数必须是UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC或这些的组合，否则返回UC_ERR_ARG错误。
-@ptr: 指向支持新映射内存的主机内存的指针。映射的主机内存的大小应该与size的大小相同或更大，并且至少使用PROT_READ | PROT_WRITE进行映射，否则不定义映射。
+@uc: `uc_open()`에서 반환된 핸들
+@address: 새 메모리 영역으로 매핑할 시작 주소. 이 주소는 4KB로 정렬되어야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
+@size: 새 메모리 영역으로 매핑할 크기. 이 크기는 4KB의 배수여야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
+@perms: 새로 매핑된 영역의 권한. 이 매개변수는 `UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC` 또는 이들의 조합이어야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
+@ptr: 새로 매핑된 메모리를 지원하는 호스트 메모리를 가리키는 포인터. 매핑되는 호스트 메모리의 크기는 `size`와 동일하거나 더 커야 하며, 최소한 `PROT_READ | PROT_WRITE`로 매핑되어야 합니다. 그렇지 않으면 매핑이 정의되지 않습니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_mem_map_ptr(uc_engine *uc, uint64_t address, size_t size, uint32_t perms, void *ptr)
@@ -2486,7 +2487,7 @@ uc_err uc_mem_map_ptr(uc_engine *uc, uint64_t address, size_t size, uint32_t per
         address = uc->mem_redirect(address);
     }
 
-    res = mem_map_check(uc, address, size, perms);    //内存安全检查
+    res = mem_map_check(uc, address, size, perms);    //메모리 안전 검사
     if (res)
         return res;
 
@@ -2496,7 +2497,7 @@ uc_err uc_mem_map_ptr(uc_engine *uc, uint64_t address, size_t size, uint32_t per
 
 </details>
 
-使用示例同 [uc_mem_map()](#uc_mem_map)
+사용예시는 [uc_mem_map()](#uc_mem_map)와 같다
 
 
 
@@ -2506,17 +2507,17 @@ uc_err uc_mem_map_ptr(uc_engine *uc, uint64_t address, size_t size, uint32_t per
 uc_err uc_mem_unmap(uc_engine *uc, uint64_t address, size_t size);
 ```
 
-取消对模拟内存区域的映射
+시뮬레이션 메모리 영역의 매핑을 취소합니다
 
 ```
-@uc: uc_open() 返回的句柄
-@address: 要映射到的新内存区域的起始地址。这个地址必须与4KB对齐，否则将返回UC_ERR_ARG错误。
-@size: 要映射到的新内存区域的大小。这个大小必须是4KB的倍数，否则将返回UC_ERR_ARG错误。
+@uc: `uc_open()`에서 반환된 핸들
+@address: 새 메모리 영역으로 매핑할 시작 주소. 이 주소는 4KB로 정렬되어야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
+@size: 새 메모리 영역으로 매핑할 크기. 이 크기는 4KB의 배수여야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_mem_unmap(struct uc_struct *uc, uint64_t address, size_t size)
@@ -2526,14 +2527,14 @@ uc_err uc_mem_unmap(struct uc_struct *uc, uint64_t address, size_t size)
     size_t count, len;
 
     if (size == 0)
-        // 没有要取消映射的区域
+        // 취소할 매핑된 영역이 없습니다.
         return UC_ERR_OK;
 
-    // 地址必须对齐到 uc->target_page_size
+    // 주소는 `uc->target_page_size`에 맞춰 정렬되어야 합니다.
     if ((address & uc->target_page_align) != 0)
         return UC_ERR_ARG;
 
-    // 大小必须是 uc->target_page_size 的倍数
+    // 크기는 `uc->target_page_size`의 배수여야 합니다.
     if ((size & uc->target_page_align) != 0)
         return UC_ERR_ARG;
 
@@ -2541,11 +2542,11 @@ uc_err uc_mem_unmap(struct uc_struct *uc, uint64_t address, size_t size)
         address = uc->mem_redirect(address);
     }
 
-    // 检查用户请求的整个块是否被映射
+    // 사용자가 요청한 전체 블록이 매핑되었는지 확인합니다.
     if (!check_mem_area(uc, address, size))
         return UC_ERR_NOMEM;
 
-    // 如果这个区域跨越了相邻的区域，可能需要分割区域
+    // 이 영역이 인접한 영역을 가로지르는 경우, 영역을 분할해야 할 수도 있습니다.
     addr = address;
     count = 0;
     while(count < size) {
@@ -2554,7 +2555,7 @@ uc_err uc_mem_unmap(struct uc_struct *uc, uint64_t address, size_t size)
         if (!split_region(uc, mr, addr, len, true))
             return UC_ERR_NOMEM;
 
-        // 取消映射
+        // 매핑 취소
         mr = memory_mapping(uc, addr);
         if (mr != NULL)
            uc->memory_unmap(uc, mr);
@@ -2568,7 +2569,7 @@ uc_err uc_mem_unmap(struct uc_struct *uc, uint64_t address, size_t size)
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 if ((err = uc_mem_map(uc, BASE, 0x1000, UC_PROT_ALL))) {
@@ -2590,18 +2591,18 @@ if ((err = uc_mem_unmap(uc, BASE, 0x1000))) {
 uc_err uc_mem_protect(uc_engine *uc, uint64_t address, size_t size, uint32_t perms);
 ```
 
-设置模拟内存的权限
+시뮬레이션 메모리의 권한 설정
 
 ```
-@uc: uc_open() 返回的句柄
-@address: 要映射到的新内存区域的起始地址。这个地址必须与4KB对齐，否则将返回UC_ERR_ARG错误。
-@size: 要映射到的新内存区域的大小。这个大小必须是4KB的倍数，否则将返回UC_ERR_ARG错误。
-@perms: 映射区域的新权限。参数必须是UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC或这些的组合，否则返回UC_ERR_ARG错误。
+@uc: `uc_open()`에서 반환된 핸들
+@address: 새 메모리 영역으로 매핑할 시작 주소. 이 주소는 4KB로 정렬되어야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
+@size: 새 메모리 영역으로 매핑할 크기. 이 크기는 4KB의 배수여야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
+@perms: 매핑된 영역의 새로운 권한. 이 매개변수는 `UC_PROT_READ | UC_PROT_WRITE | UC_PROT_EXEC` 또는 이들의 조합이어야 하며, 그렇지 않으면 `UC_ERR_ARG` 오류가 반환됩니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_mem_protect(struct uc_struct *uc, uint64_t address, size_t size, uint32_t perms)
@@ -2668,10 +2669,10 @@ uc_err uc_mem_protect(struct uc_struct *uc, uint64_t address, size_t size, uint3
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
-if ((err = uc_mem_protect(uc, BASE, 0x1000, UC_PROT_ALL))) {  //可读可写可执行
+if ((err = uc_mem_protect(uc, BASE, 0x1000, UC_PROT_ALL))) {  //읽기, 쓰기, 실행 가능
     uc_perror("uc_mem_protect", err);
     return 1;
 }
@@ -2685,19 +2686,19 @@ if ((err = uc_mem_protect(uc, BASE, 0x1000, UC_PROT_ALL))) {  //可读可写可�
 uc_err uc_mem_regions(uc_engine *uc, uc_mem_region **regions, uint32_t *count);
 ```
 
-检索由 uc_mem_map() 和 uc_mem_map_ptr() 映射的内存的信息。
+`uc_mem_map()` 및 `uc_mem_map_ptr()`로 매핑된 메모리 정보를 검색합니다.
 
-这个API为@regions分配内存，用户之后必须通过free()释放这些内存来避免内存泄漏。
+이 API는 @regions에 메모리를 할당하며, 사용자는 메모리 누수를 방지하기 위해 나중에 이 메모리를 `free()`로 해제해야 합니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@regions: 指向 uc_mem_region 结构体的数组的指针. 由Unicorn申请，必须通过uc_free()释放这些内存
-@count: 指向@regions中包含的uc_mem_region结构体的数量的指针
+@uc: `uc_open()`에서 반환된 핸들
+@regions: `uc_mem_region` 구조체 배열을 가리키는 포인터. Unicorn에 의해 할당되며, 이 메모리는 `uc_free()`를 통해 해제해야 합니다.
+@count: `@regions`에 포함된 `uc_mem_region` 구조체의 수를 가리키는 포인터
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-源码分析
+소스코드 분석
 
 <details><summary> Code </summary>
 
@@ -2712,7 +2713,7 @@ uint32_t uc_mem_regions(uc_engine *uc, uc_mem_region **regions, uint32_t *count)
     if (*count) {
         r = g_malloc0(*count * sizeof(uc_mem_region));
         if (r == NULL) {
-            // 内存不足
+            // 메모리 부족
             return UC_ERR_NOMEM;
         }
     }
@@ -2731,7 +2732,7 @@ uint32_t uc_mem_regions(uc_engine *uc, uc_mem_region **regions, uint32_t *count)
 
 </details>
 
-使用示例：
+사용예시:
 
 ```cpp
 #include <iostream>
@@ -2764,7 +2765,7 @@ int main()
 
     cout << "起始地址： 0x" << hex << region->begin << "  结束地址： 0x" << hex << region->end << "  内存权限：  " <<region->perms << "  已申请内存块数： " << count << endl;
 
-    if ((err = uc_free(region))) {    ////注意释放内存
+    if ((err = uc_free(region))) {    ////메모리 해제에 유의하세요
         uc_perror("uc_free", err);
         return 1;
     }
@@ -2773,7 +2774,7 @@ int main()
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_20.png)
 
@@ -2785,15 +2786,15 @@ int main()
 uc_err uc_free(void *mem);
 ```
 
-释放由 [uc_mem_regions()](#uc_mem_regions) 申请的内存
+[uc_mem_regions()](#uc_mem_regions)에서 할당한 메모리를 해제합니다.
 
 ```
-@mem: 由 uc_mem_regions (返回 *regions)申请的内存
+@mem: `uc_mem_regions`에서 할당한 메모리(`*regions` 반환)
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_free(void *mem)
@@ -2810,7 +2811,7 @@ void g_free(gpointer ptr)
 
 </details>
 
-使用示例同 [uc_mem_regions()](#uc_mem_regions)
+사용예시는 [uc_mem_regions()](#uc_mem_regions)와 같습니다.
 
 
 
@@ -2820,16 +2821,16 @@ void g_free(gpointer ptr)
 uc_err uc_context_alloc(uc_engine *uc, uc_context **context);
 ```
 
-分配一个可以与uc_context_{save,restore}一起使用的区域来执行CPU上下文的快速保存/回滚，包括寄存器和内部元数据。上下文不能在具有不同架构或模式的引擎实例之间共享。
+CPU 컨텍스트의 빠른 저장/복원을 수행하기 위해 `uc_context_{save,restore}`와 함께 사용할 수 있는 영역을 할당합니다. 여기에는 레지스터와 내부 메타데이터가 포함됩니다. 컨텍스트는 다른 아키텍처 또는 모드를 가진 엔진 인스턴스 간에 공유할 수 없습니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@context: 指向uc_engine*的指针。当这个函数成功返回时，将使用指向新上下文的指针更新它。之后必须使用uc_context_free()释放这些分配的内存。
+@uc: `uc_open()`에서 반환된 핸들
+@context: `uc_engine*`의 포인터를 가리키는 포인터. 이 함수가 성공적으로 반환되면, 새로운 컨텍스트를 가리키는 포인터로 업데이트됩니다. 이후 할당된 이 메모리는 `uc_context_free()`를 사용하여 해제해야 합니다.
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_context_alloc(uc_engine *uc, uc_context **context)
@@ -2850,7 +2851,7 @@ uc_err uc_context_alloc(uc_engine *uc, uc_context **context)
 
 </details>
 
-使用示例
+사용예시
 
 ```cpp
 #include <iostream>
@@ -2867,7 +2868,7 @@ int main()
     uc_context* context;
     uc_err err;
 
-    int r_eax = 0x1;    // EAX 寄存器
+    int r_eax = 0x1;    // EAX 레지스터
 
     printf("===================================\n");
     printf("Save/restore CPU context in opaque blob\n");
@@ -2885,7 +2886,7 @@ int main()
         return 0;
     }
 
-    // 初始化寄存器
+    // 레지스터 초기화
     uc_reg_write(uc, UC_X86_REG_EAX, &r_eax);
 
     printf(">>> Running emulation for the first time\n");
@@ -2901,7 +2902,7 @@ int main()
     uc_reg_read(uc, UC_X86_REG_EAX, &r_eax);
     printf(">>> EAX = 0x%x\n", r_eax);
 
-    // 申请并保存 CPU 上下文
+    // CPU 컨텍스트를 할당하고 저장합니다.
     printf(">>> Saving CPU context\n");
 
     err = uc_context_alloc(uc, &context);
@@ -2929,7 +2930,7 @@ int main()
     uc_reg_read(uc, UC_X86_REG_EAX, &r_eax);
     printf(">>> EAX = 0x%x\n", r_eax);
 
-    // 恢复 CPU 上下文
+    // CPU 컨텍스트를 복원합니다.
     err = uc_context_restore(uc, context);
     if (err) {
         printf("Failed on uc_context_restore() with error returned: %u\n", err);
@@ -2941,7 +2942,7 @@ int main()
     uc_reg_read(uc, UC_X86_REG_EAX, &r_eax);
     printf(">>> EAX = 0x%x\n", r_eax);
 
-    // 释放 CPU 上下文
+    // CPU 컨텍스트를 해제합니다.
     err = uc_context_free(context);
     if (err) {
         printf("Failed on uc_free() with error returned: %u\n", err);
@@ -2952,7 +2953,7 @@ int main()
 }
 ```
 
-输出
+출력
 
 ![image.png](API_Doc_Pic/1_21.png)
 
@@ -2964,16 +2965,16 @@ int main()
 uc_err uc_context_save(uc_engine *uc, uc_context *context);
 ```
 
-保存当前CPU上下文
+현재 CPU 컨텍스트를 저장합니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@context: uc_context_alloc() 返回的句柄
+@uc: `uc_open()`에서 반환된 핸들
+@context: `uc_context_alloc()`에서 반환된 핸들
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_context_save(uc_engine *uc, uc_context *context)
@@ -2986,7 +2987,7 @@ uc_err uc_context_save(uc_engine *uc, uc_context *context)
 
 </details>
 
-使用示例同 [uc_context_alloc()](#uc_context_alloc)
+사용예시는 [uc_context_alloc()](#uc_context_alloc)와 동일합니다.
 
 
 
@@ -2996,16 +2997,16 @@ uc_err uc_context_save(uc_engine *uc, uc_context *context)
 uc_err uc_context_restore(uc_engine *uc, uc_context *context);
 ```
 
-恢复已保存的CPU上下文
+저장된 CPU 컨텍스트를 복원합니다.
 
 ```
-@uc: uc_open() 返回的句柄
-@context: uc_context_alloc() 返回并且已使用 uc_context_save 保存的句柄
+@uc: `uc_open()`에서 반환된 핸들
+@context: `uc_context_alloc()`에서 반환되고 `uc_context_save`를 사용하여 저장된 핸들
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 uc_err uc_context_restore(uc_engine *uc, uc_context *context)
@@ -3018,7 +3019,7 @@ uc_err uc_context_restore(uc_engine *uc, uc_context *context)
 
 </details>
 
-使用示例同 [uc_context_alloc()](#uc_context_alloc)
+사용 예시는 [uc_context_alloc()](#uc_context_alloc)와 동일합니다
 
 
 
@@ -3028,16 +3029,16 @@ uc_err uc_context_restore(uc_engine *uc, uc_context *context)
 size_t uc_context_size(uc_engine *uc);
 ```
 
-返回存储cpu上下文所需的大小。可以用来分配一个缓冲区来包含cpu上下文，并直接调用uc_context_save。
+CPU 컨텍스트를 저장하는 데 필요한 크기를 반환합니다. 이를 사용하여 CPU 컨텍스트를 포함할 버퍼를 할당하고, 직접 `uc_context_save`를 호출할 수 있습니다.
 
 ```
-@uc: uc_open() 返回的句柄
+@uc: `uc_open()`에서 반환된 핸들
 
-@return 存储cpu上下文所需的大小，类型为 size_t.
+@return CPU 컨텍스트를 저장하는 데 필요한 크기. 반환 유형은 `size_t`입니다.
 ```
 
 
-<details><summary> 源码实现 </summary>
+<details><summary> 소스코드 구현 </summary>
 
 ```c
 size_t uc_context_size(uc_engine *uc)
@@ -3048,7 +3049,7 @@ size_t uc_context_size(uc_engine *uc)
 
 </details>
 
-使用示例同 [uc_context_alloc()](#uc_context_alloc)
+사용 예시는 [uc_context_alloc()](#uc_context_alloc)와 동일합니다
 
 
 
@@ -3058,12 +3059,12 @@ size_t uc_context_size(uc_engine *uc)
 uc_err uc_context_free(uc_context *context);
 ```
 
-释放由 [uc_context_alloc()](#uc_context_alloc) 申请的内存
+[uc_context_alloc()](#uc_context_alloc)에서 할당한 메모리를 해제합니다.
 
 ```
-@context: 由uc_context_alloc创建的uc_context
+@context: `uc_context_alloc`에서 생성된 `uc_context`
 
-@return 成功则返回UC_ERR_OK , 否则返回 uc_err 枚举的其他错误类型
+@return 성공 시 `UC_ERR_OK`를 반환하고, 그렇지 않으면 `uc_err` 열거형의 다른 오류 유형을 반환합니다.
 ```
 
-使用示例同 [uc_context_alloc()](#uc_context_alloc)
+사용예시는 [uc_context_alloc()](#uc_context_alloc)와 동일합니다.
